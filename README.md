@@ -67,7 +67,7 @@ You can modify the following parameters in [constants.py](constants.py) to custo
 
 | Rock | Paper | Scissors |
 |------|-------|----------|
-| ![resources/bmp/rock.bmp](resources/bmp/rock.bmp){:height="100px" width="100px"} | ![resources/bmp/paper.bmp](resources/bmp/paper.bmp){:height="100px" width="100px"} | ![resources/bmp/scissors.bmp](resources/bmp/scissors.bmp){:height="100px" width="100px"} |
+| ![resources/bmp/rock.bmp](resources/bmp/rock.bmp) | ![resources/bmp/paper.bmp](resources/bmp/paper.bmp) | ![resources/bmp/scissors.bmp](resources/bmp/scissors.bmp) |
 
 
 - The scoreboard shows the current count and percentage for each type
