@@ -1,86 +1,120 @@
+# ~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
+#      /\_/\
+#     ( o.o )
+#      > ^ <
+#
+# Author: Johan Hanekom
+# Date: July 2024
+# ~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~^~
+
+
 import pygame
 import random
-from pygame.math import Vector2
+from modules.Object.GameObjects import PlayerObject
+from modules.utils.score import ScoreBoard
+from modules.utils.rps import (
+    play_rps,
+    handle_winner
+)
+from typing import (
+    TYPE_CHECKING
+)
 from constants import (
     CANVAS_WIDTH,
+    WINDOW_TITLE,
     CANVAS_HEIGHT,
-    SPRITE_WIDTH,
-    SPRITE_HEIGHT
+    MIN_SPEED,
+    MAX_SPEED,
+    NUM_PLAYERS,
+    GAME_FPS,
+    FONT_COLOR,
+    DARK_GREY,
+    load_images,
+    load_fonts
 )
+if TYPE_CHECKING:
+    from constants import (
+        PG_IMAGES,
+        PG_FONTS
+    )
 
 
 def main_loop():
     pygame.init()
-    screen = pygame.display.set_mode((CANVAS_WIDTH, CANVAS_HEIGHT))
-    clock = pygame.time.Clock()
-    running = True
+    screen: pygame.Surface = pygame.display.set_mode(
+        size=(CANVAS_WIDTH, CANVAS_HEIGHT)
+    )
+    clock: pygame.time.Clock = pygame.time.Clock()
+    pygame.display.set_caption(WINDOW_TITLE)
 
-    background = pygame.image.load('background.bmp').convert()
+    pg_images: 'PG_IMAGES' = load_images()
+    pg_fonts: 'PG_FONTS' = load_fonts()
 
-    # Load collision sound
-    collision_sound = pygame.mixer.Sound('collision.mp3')
+    pygame.display.set_icon(pg_images.FAVICON)
 
-    player = None
-    objects = [GameObject(random.choice(['rock', 'paper', 'scissors']), random.uniform(1, 3)) for _ in range(30)]
+    # Initialize ScoreBoard
+    score_board = ScoreBoard(
+        font=pg_fonts.UBUNTU_BOLD,
+        font_color=FONT_COLOR,
+        images=pg_images
+    )
+
+    running: bool = True
+
+    all_players: list[PlayerObject] = [
+        PlayerObject(
+            player_type=random.choice(
+                [
+                    'rock',
+                    'paper',
+                    'scissors'
+                ]
+            ),
+            player_speed=random.uniform(MIN_SPEED, MAX_SPEED)
+        ) for _ in range(NUM_PLAYERS)]
+
+    # Initialize scoreboard
+    score_board.update_counts(all_players)
 
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
-        keys = pygame.key.get_pressed()
-        if player is None and (keys[pygame.K_UP] or keys[pygame.K_DOWN] or keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]):
-            player = GameObject(random.choice(['rock', 'paper', 'scissors']), 5)
-            player.pos = Vector2(CANVAS_WIDTH // 2, CANVAS_HEIGHT // 2)
-            player.rect.center = player.pos
+        # screen.blit(pg_images.BACKGROUND, (0, 0))
+        screen.fill(DARK_GREY)
 
-        screen.blit(background, (0, 0))
+        for player_1 in all_players:
+            player_1.play()
+            screen.blit(
+                source=player_1.image,
+                dest=player_1.rect.topleft
+            )
 
-        # Move and draw objects, check for collisions
-        for obj in objects:
-            obj.move()
-            screen.blit(obj.image, obj.rect.topleft)
+            for player_2 in all_players:
+                if (
+                    player_1 != player_2 and
+                    player_1.rect.colliderect(player_2.rect)
+                ):
+                    winner: str = play_rps(
+                        player_1=player_1,
+                        player_2=player_2
+                    )
+                    handle_winner(
+                        winner=winner,
+                        player_1=player_1,
+                        player_2=player_2
+                    )
 
-            if player:
-                if player.rect.colliderect(obj.rect):
-                    winner = play_rps(player, obj)
-                    if winner:
-                        if winner == player.object_type:
-                            if obj.change_type(winner):
-                                collision_sound.play()
-                        else:
-                            if player.change_type(winner):
-                                collision_sound.play()
+                    # Update scoreboard
+                    score_board.update_counts(all_players)
 
-            # Check collisions between objects
-            for other_obj in objects:
-                if obj != other_obj and obj.rect.colliderect(other_obj.rect):
-                    winner = play_rps(obj, other_obj)
-                    if winner:
-                        if winner == obj.object_type:
-                            if other_obj.change_type(winner):
-                                collision_sound.play()
-                        else:
-                            if obj.change_type(winner):
-                                collision_sound.play()
-
-        if player:
-            if keys[pygame.K_UP]:
-                player.pos.y -= player.speed
-            if keys[pygame.K_DOWN]:
-                player.pos.y += player.speed
-            if keys[pygame.K_LEFT]:
-                player.pos.x -= player.speed
-            if keys[pygame.K_RIGHT]:
-                player.pos.x += player.speed
-
-            player.pos.x = max(0, min(player.pos.x, CANVAS_WIDTH - SPRITE_WIDTH))
-            player.pos.y = max(0, min(player.pos.y, CANVAS_HEIGHT - SPRITE_HEIGHT))
-            player.rect.topleft = player.pos
-            screen.blit(player.image, player.rect.topleft)
+        # Draw scoreboard
+        score_board.draw(screen)
 
         pygame.display.flip()
-        clock.tick(60)
+        clock.tick(GAME_FPS)
+
 
 if __name__ == "__main__":
     main_loop()
