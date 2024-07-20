@@ -10,6 +10,7 @@
 
 import pygame
 import random
+from modules.utils.ternary import TernaryDiagram
 from modules.Object.GameObjects import PlayerObject
 from modules.utils.score import ScoreBoard
 from modules.utils.rps import (
@@ -28,7 +29,8 @@ from constants import (
     NUM_PLAYERS,
     GAME_FPS,
     FONT_COLOR,
-    DARK_GREY,
+    COLOR_DARK_GREY,
+    TERNARY_SIZE,
     load_images,
     load_fonts
 )
@@ -52,11 +54,18 @@ def main_loop():
 
     pygame.display.set_icon(pg_images.FAVICON)
 
+    # Initialize TernaryDiagram
+    ternary_diagram = TernaryDiagram(
+        size=TERNARY_SIZE,
+        position=(TERNARY_SIZE * 0.5, CANVAS_HEIGHT - TERNARY_SIZE * 1.5),
+    )
+
     # Initialize ScoreBoard
     score_board = ScoreBoard(
         font=pg_fonts.UBUNTU_BOLD,
         font_color=FONT_COLOR,
-        images=pg_images
+        images=pg_images,
+        ternary_diagram=ternary_diagram
     )
 
     running: bool = True
@@ -82,7 +91,7 @@ def main_loop():
                 running = False
 
         # screen.blit(pg_images.BACKGROUND, (0, 0))
-        screen.fill(DARK_GREY)
+        screen.fill(COLOR_DARK_GREY)
 
         for player_1 in all_players:
             player_1.play()

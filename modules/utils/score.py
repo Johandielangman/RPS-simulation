@@ -20,6 +20,7 @@ if TYPE_CHECKING:
     from constants import (
         PG_IMAGES
     )
+    from modules.utils.ternary import TernaryDiagram
 
 
 class ScoreBoard:
@@ -27,11 +28,13 @@ class ScoreBoard:
         self,
         font: pygame.font.Font,
         font_color: tuple[int, int, int],
-        images: 'PG_IMAGES'
+        images: 'PG_IMAGES',
+        ternary_diagram: 'TernaryDiagram'
     ) -> None:
         self.font = font
         self.font_color = font_color
         self.images = images
+        self.ternary_diagram = ternary_diagram
         self.counts: Dict[str, int] = {
             'rock': 0,
             'paper': 0,
@@ -70,7 +73,13 @@ class ScoreBoard:
             'paper': paper_count / total_count * 100 if total_count > 0 else 0,
             'scissors': scissors_count / total_count * 100 if total_count > 0 else 0
         }
+
         self.update_text_surfaces()
+        self.ternary_diagram.add_point(
+            rock=rock_count,
+            paper=paper_count,
+            scissors=scissors_count
+        )
 
     def update_text_surfaces(self) -> None:
         self.text_surfaces = {
@@ -88,12 +97,13 @@ class ScoreBoard:
 
             # Draw the image
             image: pygame.Surface = getattr(self.images, key.upper())
-            image_rect = image.get_rect(
-                midleft=(self.padding, y_position + self.line_height // 2)
-            )
+            image_rect = image.get_rect(midleft=(self.padding, y_position + self.line_height // 2))
             surface.blit(source=image, dest=image_rect)
 
             # Draw the text
-            text_x: int = image_rect.right + self.image_padding
-            text_y: int = y_position + (self.line_height - text_surface.get_height()) // 2
+            text_x = image_rect.right + self.image_padding
+            text_y = y_position + (self.line_height - text_surface.get_height()) // 2
             surface.blit(source=text_surface, dest=(text_x, text_y))
+
+        # Draw the ternary diagram
+        self.ternary_diagram.draw(surface)

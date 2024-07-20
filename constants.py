@@ -29,7 +29,11 @@ FONT_COLOR: tuple[int, int, int] = (255, 255, 255)
 FONT_SIZE: int = int(os.getenv('FONT_SIZE', 24))
 TEXT_PADDING: int = int(os.getenv('TEXT_PADDING', 10))
 
-DARK_GREY: str = "#646250"
+COLOR_DARK_GREY: str = "#646250"
+COLOR_RED: str = "#f9266a"
+
+DOT_SIZE: int = int(os.getenv('DOT_SIZE', 2))
+TERNARY_SIZE: int = int(os.getenv('TERNARY_SIZE', 100))
 
 # =======================// DIMENSION SETTINGS //======================= #
 
