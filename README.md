@@ -14,6 +14,8 @@
 
 This project is a visual simulation of the classic game Rock Paper Scissors. It uses Pygame to create an interactive environment where multiple "players" move around the screen, collide, and play Rock Paper Scissors against each other. The simulation includes a real-time scoreboard and a ternary plot to visualize the distribution of Rock, Paper, and Scissors over time.
 
+![demo](docs/demo.mp4)
+
 ## 🚀 Features
 
 - Dynamic simulation of Rock Paper Scissors gameplay
