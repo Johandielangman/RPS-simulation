@@ -28,7 +28,7 @@ Watch the demo: [demo 📽](docs/demo.mp4)
 1. Ensure you have Python 3.11+ installed on your system.
 2. Clone this repository:
    ```
-   git clone https://github.com/johanlangman/RPS-simulation.git
+   git clone https://github.com/johandielangman/RPS-simulation.git
    ```
 3. Navigate to the project directory:
    ```
